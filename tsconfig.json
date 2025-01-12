@@ -1,0 +1,30 @@
+// https://typescriptlang.org
+// https://bun.sh/docs/typescript#suggested-compileroptions
+{
+  "compilerOptions": {
+    // Add type definitions
+    "types": ["@types/gradient-string", "bun-types"],
+
+    // Enable latest features
+    "lib": ["ESNext"],
+    "module": "esnext",
+    "target": "esnext",
+
+    // If TS 5.x+
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+
+    // Allow importing `.js` from `.ts`
+    "allowJs": true,
+
+    // Best practices
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "downlevelIteration": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
