@@ -1,0 +1,13 @@
+{
+  /*
+   * Discord bot client details.
+   */
+  "client": {
+    // Bot → Token
+    "token": null,
+    // General Information → Public Key
+    "publicKey": null,
+    // General Information → Application ID
+    "applicationId": null
+  }
+}

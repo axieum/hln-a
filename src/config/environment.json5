@@ -1,0 +1,7 @@
+{
+  "client": {
+    "token": "HLNA_TOKEN",
+    "publicKey": "HLNA_PUBLIC_KEY",
+    "applicationId": "HLNA_APPLICATION_ID"
+  }
+}
