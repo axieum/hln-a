@@ -8,8 +8,8 @@ import chalk from "chalk";
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import { pastel } from "gradient-string";
 import { SlashCreator } from "slash-create";
-import { transports } from "winston";
 import { type Config, getConfig } from "./config";
+import { migrateDatabase } from "./db";
 import { labels, log } from "./logging.js";
 import { syncSlashCommands } from "./slash.js";
 
@@ -32,6 +32,10 @@ await (async () => {
     process.exitCode = 78; // Configuration error
     return;
   }
+
+  /**********************************************************************/
+  // Migrate the database.
+  await migrateDatabase();
 
   /**********************************************************************/
   // Spin up a new Discord client.

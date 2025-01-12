@@ -42,6 +42,7 @@ const symbols = {
 /** A predefined collection of reusable log labels. */
 export const labels = {
   discord: { label: "discord" },
+  db: { label: "db" },
   commands: { label: "commands" },
   config: { label: "config" },
 };
@@ -49,6 +50,7 @@ export const labels = {
 /** A mapping of predefined log labels to their styled variant for use in terminals. */
 const styledLabels = {
   discord: chalk.hex("#ffbb33")("[DISCORD]"),
+  db: chalk.hex("#35b6fc")("[DB]"),
   commands: chalk.hex("#ffdc9c")("[COMMANDS]"),
   config: chalk.hex("#f6e3bf")("[CONFIG]"),
 };
