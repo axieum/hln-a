@@ -51,8 +51,7 @@ export default class DinoWipeCommand extends SlashCommand {
         .from(arkDinoWipes)
         .where(and(eq(arkDinoWipes.server, arkServer.name), eq(arkDinoWipes.success, true)))
         .orderBy(desc(arkDinoWipes.created_at));
-      let nextPollAt =
-        polls.length > 0 ? new Date(polls[0].created_at.getTime() + this.config.ark.dinowipeCooldown * 1_000) : null;
+      let nextPollAt = polls.length > 0 ? new Date(polls[0].created_at.getTime() + this.config.ark.dinowipe.cooldown * 1_000) : null;
       if (nextPollAt && nextPollAt <= new Date()) nextPollAt = null;
 
       // Check if there are any holds in place
@@ -112,12 +111,13 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
    */
   async startPoll(ctx: CommandContext, btnCtx: ComponentContext, arkServer: ArkServer) {
     const user = btnCtx.user;
+    const ping = this.config.ark.dinowipe.ping ? ` — <@&${this.config.ark.dinowipe.ping}>` : '';
     await btnCtx.acknowledge();
     log.debug("@%s is starting a new dino wipe poll on %s...", user.username, arkServer.label, labels.ark);
 
     // Send some instructions
     await btnCtx.editOriginal({
-      content: `For a dino wipe to take place on **${arkServer.label}**, you must get 100% favour ${getTimestamp(new Date(new Date().getTime() + this.config.ark.dinowipePollDuration * 1_000), "R")}`,
+      content: `For a dino wipe to take place on **${arkServer.label}**, you must get 100% favour ${getTimestamp(new Date(new Date().getTime() + this.config.ark.dinowipe.pollDuration * 1_000), "R")}${ping}`,
       components: [],
     });
 
@@ -131,7 +131,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
           { answer_id: 1, poll_media: { text: "Yes", emoji: { name: "✅" } } },
           { answer_id: 2, poll_media: { text: "No", emoji: { name: "🙅" } } },
         ],
-        duration: Math.max(Math.floor(this.config.ark.dinowipePollDuration / 3_600), 1),
+        duration: Math.max(Math.floor(this.config.ark.dinowipe.pollDuration / 3_600), 1),
       },
     });
     log.info("@%s started a new dino wipe poll on %s (%s)", user.username, arkServer.label, pollMessage.id, labels.ark);
@@ -171,14 +171,15 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
         // The dino wipe will go ahead
         log.info("@%s's dino wipe poll on %s succeeded", user.username, arkServer.label, labels.ark);
         await message.reply({
+          content: this.config.ark.dinowipe.ping ? `<@&${this.config.ark.dinowipe.ping}> —` : '',
           embeds: [{
-            description: `All wild dinosaurs will shortly disappear from **${arkServer.label}**...`,
+            description: `All wild dinosaurs will shortly disappear from **${arkServer.label}**`,
             color: Colors.Green,
           }],
         });
         await performDinoWipe(arkServer);
       }
-    }, this.config.ark.dinowipePollDuration * 1_000);
+    }, this.config.ark.dinowipe.pollDuration * 1_000);
   }
 
   /**
@@ -196,7 +197,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
       .then(async () => {
         log.info("@%s is preventing dino wipe polls on %s", btnCtx.user.username, arkServer.label, labels.ark);
         await btnCtx.editOriginal({
-          content: "",
+          content: this.config.ark.dinowipe.ping ? `<@&${this.config.ark.dinowipe.ping}> —` : '',
           embeds: [{
             description: `**${btnCtx.user.mention}** is preventing dino wipe polls on **${arkServer.label}**`,
             color: Colors.Orange,
@@ -237,7 +238,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
           labels.ark,
         );
         await btnCtx.editOriginal({
-          content: "",
+          content: this.config.ark.dinowipe.ping ? `<@&${this.config.ark.dinowipe.ping}> —` : '',
           embeds: [{
             description: `**${btnCtx.user.mention}** is no longer preventing dino wipe polls on **${arkServer.label}**`,
             color: Colors.Green,
@@ -278,7 +279,7 @@ export function getTimestamp(date: Date, format: "R" | "D" | "d" | "T" | "t" | "
 export async function performDinoWipe(arkServer: ArkServer) {
   // Check if this server has RCON configured
   if (!arkServer.rcon_ip || !arkServer.rcon_port || !arkServer.rcon_password) {
-    log.warning(`The ${arkServer.label} ARK server does not have a valid RCON configuration!`);
+    log.warn(`The ${arkServer.label} ARK server does not have a valid RCON configuration!`, labels.ark);
     return;
   }
 
