@@ -1,0 +1,13 @@
+.git/
+.idea/
+node_modules/
+.dockerignore
+.editorconfig
+.env
+.gitignore
+.vscode
+Dockerfile*
+docker-compose*
+helm-charts
+LICENCE.txt
+README.md
