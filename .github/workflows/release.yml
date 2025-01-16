@@ -1,0 +1,32 @@
+# Prepares new releases
+
+name: Release
+
+# On changes to release branches
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Release
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🙌 Prepare release
+        id: release-please
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: .github/release-please.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+    outputs:
+      release_created: ${{ steps.release-please.outputs.release_created }}
+      tag_name: ${{ steps.release-please.outputs.tag_name }}
+      major: ${{ steps.release-please.outputs.major }}
+      minor: ${{ steps.release-please.outputs.minor }}
+      patch: ${{ steps.release-please.outputs.patch }}
