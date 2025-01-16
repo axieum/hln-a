@@ -321,13 +321,14 @@ export async function performDinoWipe(arkServer: ArkServer) {
     await sleep(1_000);
     client.send("ServerChat All wild dinosaurs will be killed in 2 seconds...");
     await sleep(1_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 1 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 1 second...");
     await sleep(1_000);
     // Destroy wild dinosaurs
     client.send("DestroyWildDinos");
-    client.send("ServerChat All wild dinosaurs that have been killed!");
-    // Disconnect shortly after
     await sleep(3_000);
+    client.send("ServerChat All wild dinosaurs have been killed!");
+    // Disconnect shortly after
+    await sleep(1_000);
     client.disconnect();
   });
   client.on("response", async (msg: string) => log.debug("(%s) %s", arkServer.name, msg, labels.ark));
