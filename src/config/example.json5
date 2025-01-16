@@ -4,10 +4,87 @@
    */
   "client": {
     // Bot → Token
-    "token": null,
+    "token": "",
     // General Information → Public Key
-    "publicKey": null,
+    "publicKey": "",
     // General Information → Application ID
-    "applicationId": null
+    "applicationId": ""
+  },
+  /*
+   * ARK: Survival Ascended
+   */
+  "ark": {
+    // A list of available ARK servers
+    "servers": [
+      {
+        // The name of the ARK server
+        "name": "The Island",
+        // An emoji that represents the ARK server
+        "emoji": "🏝️",
+        // The RCON IP address used to execute commands
+        "rcon_ip": "",
+        // The RCON port used to connect
+        "rcon_port": 27024,
+        // The RCON admin password used to authenticate
+        "rcon_password": ""
+      },
+      {
+        // The name of the ARK server
+        "name": "Scorched Earth",
+        // An emoji that represents the ARK server
+        "emoji": "🏜️",
+        // The RCON IP address used to execute commands
+        "rcon_ip": "",
+        // The RCON port used to connect
+        "rcon_port": 27024,
+        // The RCON admin password used to authenticate
+        "rcon_password": ""
+      },
+      {
+        // The name of the ARK server
+        "name": "The Center",
+        // An emoji that represents the ARK server
+        "emoji": "🌋",
+        // The RCON IP address used to execute commands
+        "rcon_ip": "",
+        // The RCON port used to connect
+        "rcon_port": 27024,
+        // The RCON admin password used to authenticate
+        "rcon_password": ""
+      },
+      {
+        // The name of the ARK server
+        "name": "Aberration",
+        // An emoji that represents the ARK server
+        "emoji": "🕳️",
+        // The RCON IP address used to execute commands
+        "rcon_ip": "",
+        // The RCON port used to connect
+        "rcon_port": 27024,
+        // The RCON admin password used to authenticate
+        "rcon_password": ""
+      },
+      {
+        // The name of the ARK server
+        "name": "Extinction",
+        // An emoji that represents the ARK server
+        "emoji": "☄️",
+        // The RCON IP address used to execute commands
+        "rcon_ip": "",
+        // The RCON port used to connect
+        "rcon_port": 27024,
+        // The RCON admin password used to authenticate
+        "rcon_password": ""
+      }
+    ],
+    // Dinosaur wipe options
+    "dinowipe": {
+      // An optional ID of the discord role to ping for updates
+      "ping": "",
+      // The number of seconds that the poll runs for
+      "pollDuration": 300,
+      // The number of seconds between dino wipes
+      "cooldown": 3600
+    }
   }
 }
