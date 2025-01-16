@@ -1,5 +1,5 @@
 import { sleep } from "bun";
-import type { Client, TextChannel } from "discord.js";
+import {Colors, type Client, type TextChannel } from "discord.js";
 import { and, desc, eq } from "drizzle-orm";
 import {
   ButtonStyle,
@@ -43,7 +43,7 @@ export default class DinoWipeCommand extends SlashCommand {
     ctx.registerComponent("server_input", async (inputCtx) => {
       // Validate the chosen ARK server
       const arkServer = this.config.ark.servers.find((server) => server.name === inputCtx.values[0]);
-      if (!arkServer) return await inputCtx.editOriginal({ content: `That ARK server doesn't exist!` });
+      if (!arkServer) return await inputCtx.editOriginal({ content: `That ARK server doesn't exist!`, components: [] });
 
       // Check if there was recently a winning poll
       const polls = await db
@@ -61,8 +61,8 @@ export default class DinoWipeCommand extends SlashCommand {
       // Prompt for an action
       await inputCtx.editOriginal({
         content: `${holds.length === 0 && !nextPollAt ? `Would you like to dino wipe **${arkServer.label}**?` : ""}
-${holds.length > 0 ? `<@${holds[0].user_id}> is preventing dino wipes on **${arkServer.label}**: ${getTimestamp(holds[0].created_at, "R")}!` : ""}
-${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${getTimestamp(nextPollAt, "R")}!` : ""}`.trim(),
+${holds.length > 0 ? `<@${holds[0].user_id}> is preventing dino wipes on **${arkServer.label}** — ${getTimestamp(holds[0].created_at, "R")}` : ""}
+${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${getTimestamp(nextPollAt, "R")}` : ""}`.trim(),
         components: [
           {
             type: ComponentType.ACTION_ROW,
@@ -150,17 +150,32 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
       if (yesAnswer.voteCount === 0 && noAnswer.voteCount === 0) {
         // The dino wipe is undecided
         log.info("@%s's dino wipe poll on %s was undecided", user.username, arkServer.label, labels.ark);
-        await message.reply(`No one voted for a dino wipe on **${arkServer.name}** 🤷‍♀️`);
+        await message.reply({
+          embeds: [{
+            description: `No one voted for a dino wipe on **${arkServer.name}** 🤷‍♀️`,
+            color: Colors.Red,
+          }],
+        });
         await db.update(arkDinoWipes).set({ success: false }).where(eq(arkDinoWipes.poll_id, message.id));
       } else if (noAnswer.voteCount >= 1) {
         // At least one person objected to a dino wipe
         log.info("@%s's dino wipe poll on %s failed", user.username, arkServer.label, labels.ark);
-        await message.reply(`At least one person objected to a dino wipe on **${arkServer.name}** 🙅‍♀️`);
+        await message.reply({
+          embeds: [{
+            description: `At least one person objected to a dino wipe on **${arkServer.name}** 🙅‍♀️`,
+            color: Colors.Red,
+          }],
+        });
         await db.update(arkDinoWipes).set({ success: false }).where(eq(arkDinoWipes.poll_id, message.id));
       } else {
         // The dino wipe will go ahead
         log.info("@%s's dino wipe poll on %s succeeded", user.username, arkServer.label, labels.ark);
-        await message.reply(`Everyone voted for a dino wipe on **${arkServer.label}**, sending instructions...`);
+        await message.reply({
+          embeds: [{
+            description: `All wild dinosaurs will shortly disappear from **${arkServer.label}**...`,
+            color: Colors.Green,
+          }],
+        });
         await performDinoWipe(arkServer);
       }
     }, this.config.ark.dinowipePollDuration * 1_000);
@@ -181,14 +196,22 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
       .then(async () => {
         log.info("@%s is preventing dino wipe polls on %s", btnCtx.user.username, arkServer.label, labels.ark);
         await btnCtx.editOriginal({
-          content: `${btnCtx.user.mention} is preventing dino wipe polls on **${arkServer.label}**.`,
+          content: "",
+          embeds: [{
+            description: `**${btnCtx.user.mention}** is preventing dino wipe polls on **${arkServer.label}**`,
+            color: Colors.Orange,
+          }],
           components: [],
         });
       })
       .catch(async (err) => {
         log.error("Unable to pause dino wipe polls on %s: %s", arkServer.label, err, labels.ark);
         await btnCtx.editOriginal({
-          content: "We were unable to put dino wipes on hold for you, please try again later!",
+          content: "",
+          embeds: [{
+            description: "We were unable to put dino wipes on hold for you, please try again later!",
+            color: Colors.Red,
+          }],
           components: [],
         });
       });
@@ -214,14 +237,22 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
           labels.ark,
         );
         await btnCtx.editOriginal({
-          content: `${btnCtx.user.mention} is no longer preventing dino wipe polls on **${arkServer.label}**.`,
+          content: "",
+          embeds: [{
+            description: `**${btnCtx.user.mention}** is no longer preventing dino wipe polls on **${arkServer.label}**`,
+            color: Colors.Green,
+          }],
           components: [],
         });
       })
       .catch(async (err) => {
         log.error("Unable to resume dino wipe polls on %s: %s", arkServer.label, err, labels.ark);
         await btnCtx.editOriginal({
-          content: "We were unable to remove your hold on dino wipes, please try again later!",
+          content: "",
+          embeds: [{
+            description: "We were unable to remove your hold on dino wipes, please try again later!",
+            color: Colors.Red,
+          }],
           components: [],
         });
       });
