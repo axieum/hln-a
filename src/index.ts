@@ -51,6 +51,7 @@ await (async () => {
     token: config.client.token,
     publicKey: config.client.publicKey,
     applicationID: config.client.applicationId,
+    componentTimeouts: true,
     client,
   });
 
