@@ -260,24 +260,25 @@ export async function performDinoWipe(arkServer: ArkServer) {
   client.on("auth", async () => {
     log.info("(%s) RCON connected", arkServer.name, labels.ark);
     // Countdown in-game
-    client.send("Broadcast A dino wipe will take place in 60 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 60 seconds...");
     await sleep(30_000);
-    client.send("Broadcast A dino wipe will take place in 30 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 30 seconds...");
     await sleep(20_000);
-    client.send("Broadcast A dino wipe will take place in 10 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 10 seconds...");
     await sleep(5_000);
-    client.send("Broadcast A dino wipe will take place in 5 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 5 seconds...");
     await sleep(1_000);
-    client.send("Broadcast A dino wipe will take place in 4 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 4 seconds...");
     await sleep(1_000);
-    client.send("Broadcast A dino wipe will take place in 3 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 3 seconds...");
     await sleep(1_000);
-    client.send("Broadcast A dino wipe will take place in 2 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 2 seconds...");
     await sleep(1_000);
-    client.send("Broadcast A dino wipe will take place in 1 seconds...");
+    client.send("ServerChat All wild dinosaurs will be killed in 1 seconds...");
     await sleep(1_000);
     // Destroy wild dinosaurs
     client.send("DestroyWildDinos");
+    client.send("ServerChat All wild dinosaurs that have been killed!");
     // Disconnect shortly after
     await sleep(3_000);
     client.disconnect();
