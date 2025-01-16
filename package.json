@@ -1,6 +1,6 @@
 {
   "name": "hln-a",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A Discord bot for unofficial ARK Survival Ascended clusters",
   "type": "module",
   "scripts": {
@@ -13,7 +13,14 @@
     "type": "git",
     "url": "git+https://github.com/axieum/hln-a.git"
   },
-  "keywords": ["ark", "ascended", "bot", "discord", "helena", "survival"],
+  "keywords": [
+    "ark",
+    "ascended",
+    "bot",
+    "discord",
+    "helena",
+    "survival"
+  ],
   "author": "Jonathan Hiles <jonathan@hil.es>",
   "license": "MIT",
   "bugs": {
