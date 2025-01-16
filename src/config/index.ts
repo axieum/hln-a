@@ -13,6 +13,7 @@ import _ from "lodash";
 import { ZodError, z } from "zod";
 import { fromZodIssue } from "zod-validation-error";
 import { labels, log } from "../logging.js";
+import { arkSchema } from "./ark.ts";
 
 /** The filename of the user-provided configuration file. */
 const userConfig = "config.json5";
@@ -28,6 +29,8 @@ export const schema = z.object({
     // General Information → Application ID
     applicationId: z.string().nonempty(),
   }),
+  // ARK: Survival Ascended
+  ark: arkSchema,
 });
 
 /** The configuration object type. */

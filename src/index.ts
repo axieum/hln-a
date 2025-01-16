@@ -39,7 +39,7 @@ await (async () => {
 
   /**********************************************************************/
   // Spin up a new Discord client.
-  const client: Client = new Client({ intents: [GatewayIntentBits.Guilds] });
+  const client: Client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessagePolls] });
 
   client.once(Events.ClientReady, () => {
     log.log("success", pastel(`Ready! Logged in as ${client.user?.tag}`), labels.discord);
@@ -54,7 +54,7 @@ await (async () => {
     client,
   });
 
-  await syncSlashCommands(slash);
+  await syncSlashCommands(slash, config);
 
   /**********************************************************************/
   // Login to Discord.

@@ -7,19 +7,27 @@
 import chalk from "chalk";
 import { type Client, GatewayDispatchEvents } from "discord.js";
 import { GatewayServer, type SlashCreator } from "slash-create";
-import { commands } from "./cmd";
+import type { SlashCommand } from "./cmd";
+import DinoWipeCommand from "./cmd/dinowipe.ts";
+import type { Config } from "./config";
 import { labels, log } from "./logging";
+
+/**
+ * A collection of all available Discord slash commands.
+ */
+export const ALL_COMMANDS: (new (creator: SlashCreator, config: Config) => SlashCommand)[] = [DinoWipeCommand];
 
 /**
  * Registers and syncs all Discord slash commands.
  *
  * @param creator slash-create client
+ * @param config The application configuration.
  * @return promise for syncing slash commands
  */
-export async function syncSlashCommands(creator: SlashCreator): Promise<void> {
+export async function syncSlashCommands(creator: SlashCreator, config: Config): Promise<void> {
   log.info("Syncing slash commands...", labels.commands);
 
-  // Register commands
+  // Create `slash-create` client
   creator
     .withServer(
       new GatewayServer((handler) =>
@@ -36,14 +44,18 @@ export async function syncSlashCommands(creator: SlashCreator): Promise<void> {
       log.info(
         "%s ran command %s",
         chalk.bold(`@${ctx.user.username}`),
-        chalk.underline(`/${cmd.commandName}`),
+        chalk.underline(`/${cmd.commandName}${ctx.subcommands.length > 0 ? ` ${ctx.subcommands.join(" ")}` : ""}`),
         labels.commands,
       ),
     )
     .on("commandError", (cmd, error) =>
       log.error("The %s command failed!\n%s", chalk.underline(`/${cmd.commandName}`), error, labels.commands),
-    )
-    .registerCommands(commands);
+    );
+
+  // Register commands
+  for (const command of ALL_COMMANDS) {
+    creator.registerCommand(new command(creator, config));
+  }
 
   // Sync the commands
   await creator
