@@ -16,7 +16,7 @@ import { labels, log } from "../logging.js";
 import { arkSchema } from "./ark.ts";
 
 /** The filename of the user-provided configuration file. */
-const userConfig = "config.json5";
+const userConfig = process.env.HLNA_CONFIG_FILE ?? "config.json5";
 
 /** The configuration schema. */
 export const schema = z.object({
