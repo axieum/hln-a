@@ -9,6 +9,9 @@ import chalk from "chalk";
 import { createLogger, format, transports } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 
+/** The directory to store log files. */
+const logsDir = process.env.HLNA_LOGS_DIR ?? "./logs";
+
 /** A hierarchy of log level names. */
 const levels = {
   error: 0,
@@ -93,8 +96,8 @@ export const log = createLogger({
     // Daily rotating file
     // https://github.com/winstonjs/winston-daily-rotate-file#options
     new DailyRotateFile({
-      filename: "./logs/%DATE%.log",
-      auditFile: "./logs/.audit.json",
+      filename: `${logsDir}/%DATE%.log`,
+      auditFile: `${logsDir}/.audit.json`,
       maxSize: process.env.HLNA_LOG_MAX_SIZE ?? undefined,
       maxFiles: process.env.HLNA_LOG_RETENTION ?? "14d",
       zippedArchive: true,
