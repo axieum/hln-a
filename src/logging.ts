@@ -45,6 +45,7 @@ export const labels = {
   db: { label: "db" },
   commands: { label: "commands" },
   config: { label: "config" },
+  ark: { label: "ark" },
 };
 
 /** A mapping of predefined log labels to their styled variant for use in terminals. */
@@ -53,6 +54,7 @@ const styledLabels = {
   db: chalk.hex("#35b6fc")("[DB]"),
   commands: chalk.hex("#ffdc9c")("[COMMANDS]"),
   config: chalk.hex("#f6e3bf")("[CONFIG]"),
+  ark: chalk.hex("#00d724")("[ARK]"),
 };
 
 /** The metadata attached to a log record. */

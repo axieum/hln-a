@@ -9,5 +9,47 @@
     "publicKey": null,
     // General Information → Application ID
     "applicationId": null
+  },
+  /*
+   * ARK: Survival Ascended
+   */
+  "ark": {
+    // The number of seconds that the poll runs for
+    dinowipePollDuration: 300,
+    // The number of seconds between dino wipes
+    dinowipeCooldown: 3600,
+    // A list of available ARK servers
+    "servers": [
+      {
+        // The name of the ARK server
+        "name": "The Island",
+        // An emoji that represents the ARK server
+        "emoji": "🏝️"
+      },
+      {
+        // The name of the ARK server
+        "name": "Scorched Earth",
+        // An emoji that represents the ARK server
+        "emoji":  "🏜️"
+      },
+      {
+        // The name of the ARK server
+        "name": "The Center",
+        // An emoji that represents the ARK server
+        "emoji":  "🌋"
+      },
+      {
+        // The name of the ARK server
+        "name": "Aberration",
+        // An emoji that represents the ARK server
+        "emoji":  "🕳️"
+      },
+      {
+        // The name of the ARK server
+        "name": "Extinction",
+        // An emoji that represents the ARK server
+        "emoji":  "☄️"
+      }
+    ]
   }
 }

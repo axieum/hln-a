@@ -92,7 +92,7 @@ describe("config", () => {
     it("should load configuration", () => {
       spyOn(fs, "readFileSync")
         // Defaults
-        .mockReturnValueOnce('{"client": {"token": "mock", "applicationId": null}}')
+        .mockReturnValueOnce('{"client": {"token": "mock", "applicationId": null}, "ark": {"servers": []}}')
         // User configuration
         .mockReturnValueOnce('{"client": {"applicationId": "123"}}')
         // Environment variables
@@ -127,10 +127,11 @@ describe("config", () => {
       expect(getConfig()).toBeUndefined();
       expect(
         logErrorSpy.mock.lastCall?.[0].toString(),
-      ).toBe(`We found ${chalk.bold.underline("3 issues")} with your configuration:
+      ).toBe(`We found ${chalk.bold.underline("4 issues")} with your configuration:
 ├ String must contain at least 1 character(s) at "client.token"
 ├ Required at "client.publicKey"
-└ String must contain at least 1 character(s) at "client.applicationId"`);
+├ String must contain at least 1 character(s) at "client.applicationId"
+└ Required at "ark"`);
     });
   });
 });
