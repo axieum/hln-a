@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/axieum/hln-a/compare/v0.1.1...v0.1.2) (2025-01-16)
+
+
+### Bug Fixes
+
+* add `HLNA_LOGS_DIR` and `HLNA_CONFIG_FILE` env vars ([c7506ff](https://github.com/axieum/hln-a/commit/c7506ffc91c110a1840c0c0ae5452ee532dffd3e))
+
 ## [0.1.1](https://github.com/axieum/hln-a/compare/v0.1.0...v0.1.1) (2025-01-16)
 
 
