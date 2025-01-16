@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/axieum/hln-a/compare/v1.0.0...v1.0.1) (2025-01-16)
+
+
+### Bug Fixes
+
+* **ark:** change the Extinction map's default emoji to 🌆 from ☄️ ([242337b](https://github.com/axieum/hln-a/commit/242337bf54f08a9398a957624da73cca9d33bd6a))
+* **ark:** prefer pinging Discord roles in unedited messages ([5eba383](https://github.com/axieum/hln-a/commit/5eba383f8bacd26af330a9f8304da2fcf67940ac))
+* **ark:** the `DestroyWildDinos` instruction was not always sent over RCON during the `/dinowipe` command ([015ab00](https://github.com/axieum/hln-a/commit/015ab004dcb7ba15b3c259062fea3981d66923db))
+
 ## [1.0.0](https://github.com/axieum/hln-a/compare/v0.1.0...v1.0.0) (2025-01-16)
 
 
