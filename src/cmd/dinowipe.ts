@@ -112,18 +112,18 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
    */
   async startPoll(ctx: CommandContext, btnCtx: ComponentContext, arkServer: ArkServer) {
     const user = btnCtx.user;
-    const ping = this.config.ark.dinowipe.ping ? ` — <@&${this.config.ark.dinowipe.ping}>` : "";
     await btnCtx.acknowledge();
     log.debug("@%s is starting a new dino wipe poll on %s...", user.username, arkServer.label, labels.ark);
 
     // Send some instructions
     await btnCtx.editOriginal({
-      content: `For a dino wipe to take place on **${arkServer.label}**, you must get 100% favour ${getTimestamp(new Date(new Date().getTime() + this.config.ark.dinowipe.pollDuration * 1_000), "R")}${ping}`,
+      content: `For a dino wipe to take place on **${arkServer.label}**, you must get 100% favour ${getTimestamp(new Date(new Date().getTime() + this.config.ark.dinowipe.pollDuration * 1_000), "R")}`,
       components: [],
     });
 
     // Start a new poll
     const pollMessage = await btnCtx.sendFollowUp({
+      content: `<@&${this.config.ark.dinowipe.ping}>, please vote for the wild dinos' sake —`,
       poll: {
         question: {
           text: `${user.globalName ?? user.username} is asking for a dino wipe on ${arkServer.label}`,
@@ -144,6 +144,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
       // End the poll
       const channel = (await (this.client as Client).channels.fetch(pollMessage.channelID))!;
       const message = await (channel as TextChannel).messages.endPoll(pollMessage.id);
+      await sleep(10_000); /* NB: Discord will send a poll results message shortly after closing, let's wait for it */
       // Check the poll results
       const yesAnswer = message.poll!.answers.get(1)!;
       const noAnswer = message.poll!.answers.get(2)!;
@@ -162,7 +163,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
         await db.update(arkDinoWipes).set({ success: false }).where(eq(arkDinoWipes.poll_id, message.id));
       } else if (noAnswer.voteCount >= 1) {
         // At least one person objected to a dino wipe
-        log.info("@%s's dino wipe poll on %s failed", user.username, arkServer.label, labels.ark);
+        log.info("@%s's dino wipe poll on %s was rejected", user.username, arkServer.label, labels.ark);
         await message.reply({
           embeds: [
             {
@@ -174,7 +175,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
         await db.update(arkDinoWipes).set({ success: false }).where(eq(arkDinoWipes.poll_id, message.id));
       } else {
         // The dino wipe will go ahead
-        log.info("@%s's dino wipe poll on %s succeeded", user.username, arkServer.label, labels.ark);
+        log.info("@%s's dino wipe poll on %s won", user.username, arkServer.label, labels.ark);
         await message.reply({
           content: this.config.ark.dinowipe.ping ? `<@&${this.config.ark.dinowipe.ping}> —` : "",
           embeds: [
