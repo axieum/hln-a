@@ -27,8 +27,13 @@ export type ArkServer = z.infer<typeof arkServerSchema>;
 export const arkSchema = z.object({
   // A list of available ARK servers
   servers: z.array(arkServerSchema),
-  // The number of seconds that the poll runs for
-  dinowipePollDuration: z.number().int().default(300), // 300s = 5m
-  // The number of seconds between dino wipes
-  dinowipeCooldown: z.number().int().default(3_600), // 3600s = 1h
+  // Dinosaur wipe options
+  dinowipe: z.object({
+    // An optional ID of the discord role to ping for updates
+    ping: z.string().optional(),
+    // The number of seconds between dino wipes
+    cooldown: z.number().int().default(3_600), // 3600s = 1h
+    // The number of seconds that the poll runs for
+    pollDuration: z.number().int().default(300), // 300s = 5m
+  }),
 });
