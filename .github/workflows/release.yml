@@ -1,4 +1,4 @@
-# Prepares new releases
+# Prepares, builds and publishes new releases
 
 name: Release
 
@@ -18,15 +18,38 @@ jobs:
 
     steps:
       - name: 🙌 Prepare release
-        id: release-please
+        id: release
         uses: googleapis/release-please-action@v4
         with:
           config-file: .github/release-please.json
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: ✨ Checkout repository
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+
+      - name: 🏷️ Tag major and minor versions
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/axieum/hln-a.git"
+          git tag -d v${{ steps.release.outputs.major }} || true
+          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git push gh-token :v${{ steps.release.outputs.major }} || true
+          git push gh-token :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git tag -a v${{ steps.release.outputs.major }} -m "chore: release v${{ steps.release.outputs.major }}"
+          git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "chore: release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
+          git push gh-token v${{ steps.release.outputs.major }}
+          git push gh-token v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
+
     outputs:
-      release_created: ${{ steps.release-please.outputs.release_created }}
-      tag_name: ${{ steps.release-please.outputs.tag_name }}
-      major: ${{ steps.release-please.outputs.major }}
-      minor: ${{ steps.release-please.outputs.minor }}
-      patch: ${{ steps.release-please.outputs.patch }}
+      release_created: ${{ steps.release.outputs.release_created }}
+
+  publish:
+    name: Publish
+
+    needs: [ release ]
+    if: ${{ needs.release.outputs.release_created == 'true' }}
+
+    uses: ./.github/workflows/publish.yml

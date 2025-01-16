@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": []
+    "ignore": [".release-please-manifest.json", "package.json"]
   },
   "formatter": {
     "enabled": true,

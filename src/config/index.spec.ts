@@ -92,7 +92,9 @@ describe("config", () => {
     it("should load configuration", () => {
       spyOn(fs, "readFileSync")
         // Defaults
-        .mockReturnValueOnce('{"client": {"token": "mock", "applicationId": null}, "ark": {"servers": []}}')
+        .mockReturnValueOnce(
+          '{"client": {"token": "mock", "applicationId": null}, "ark": {"servers": [], "dinowipe": {}}}',
+        )
         // User configuration
         .mockReturnValueOnce('{"client": {"applicationId": "123"}}')
         // Environment variables
