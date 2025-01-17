@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/axieum/hln-a/compare/v1.1.0...v1.1.1) (2025-01-17)
+
+
+### Bug Fixes
+
+* **ark:** the last player was not always accounted for in the `/ark listplayers` command ([77b2c52](https://github.com/axieum/hln-a/commit/77b2c528010961c49b36a4cffdedf17f2713fdd9))
+
 ## [1.1.0](https://github.com/axieum/hln-a/compare/v1.0.1...v1.1.0) (2025-01-17)
 
 
