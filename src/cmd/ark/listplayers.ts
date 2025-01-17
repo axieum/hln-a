@@ -78,7 +78,7 @@ export async function listPlayers(arkServer: ArkServer) {
       client.disconnect();
     });
     client.on("response", async (msg: string) =>
-      resolve([...msg.matchAll(/^(\d+)\. ([^,]+), \w+$/gm)].map((entry, i) => `${i + 1}. **${entry[2]}**`)),
+      resolve([...msg.matchAll(/^(\d+)\. ([^,]+), \w+/gm)].map((entry, i) => `${i + 1}. **${entry[2]}**`)),
     );
     client.on("error", async (error) => log.error("(%s) %s", arkServer.name, error, labels.ark));
     client.on("end", async () => log.info("(%s) RCON disconnected", arkServer.name, labels.ark));
