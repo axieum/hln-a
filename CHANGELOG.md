@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0](https://github.com/axieum/hln-a/compare/v1.0.1...v1.1.0) (2025-01-17)
+
+
+### Features
+
+* **ark:** add `/ark listplayers` command ([71924e9](https://github.com/axieum/hln-a/commit/71924e963274457222c7b3016eae00046d06688a))
+* **ark:** add error feedback during the `/ark dinowipe` command ([8bb1c52](https://github.com/axieum/hln-a/commit/8bb1c52f5caf4e1ab6cc87b49376ea35a14cc505))
+* **ark:** rename `/dinowipe` command to `/ark dinowipe` ([02eab35](https://github.com/axieum/hln-a/commit/02eab35c74b9e60e2d64c02553a2e454b1799745))
+
 ## [1.0.1](https://github.com/axieum/hln-a/compare/v1.0.0...v1.0.1) (2025-01-16)
 
 
