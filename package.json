@@ -1,6 +1,6 @@
 {
   "name": "hln-a",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A Discord bot for unofficial ARK Survival Ascended clusters",
   "type": "module",
   "scripts": {
