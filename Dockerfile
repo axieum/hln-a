@@ -34,4 +34,7 @@ COPY --from=prerelease /usr/src/app/package.json .
 
 # ↳ run the app
 USER bun
+ENV HLNA_CONFIG_FILE=/data/config.json5 \
+    HLNA_DATABASE_URL=/data/sqlite.db \
+    HLNA_LOGS_DIR=/data/logs
 ENTRYPOINT [ "bun", "run", "start" ]
