@@ -1,29 +1,18 @@
 import { sleep } from "bun";
-import { type Client, Colors, type TextChannel } from "discord.js";
+import { Colors, type TextChannel } from "discord.js";
 import { and, desc, eq } from "drizzle-orm";
-import {
-  ButtonStyle,
-  type CommandContext,
-  type ComponentContext,
-  ComponentType,
-  type SlashCreator,
-} from "slash-create";
+import { ButtonStyle, type CommandContext, type ComponentContext, ComponentType } from "slash-create";
 import Rcon from "ts-rcon";
-import type { Config } from "../config";
-import type { ArkServer } from "../config/ark.ts";
-import { db } from "../db";
-import { arkDinoWipeBlocks, arkDinoWipes } from "../db/schema.ts";
-import { labels, log } from "../logging.ts";
-import { SlashCommand } from "./index.ts";
+import type { ArkServer } from "../../config/ark.ts";
+import { db } from "../../db";
+import { arkDinoWipeBlocks, arkDinoWipes } from "../../db/schema.ts";
+import { labels, log } from "../../logging.ts";
+import { SlashSubCommand } from "../index.ts";
 
 /**
  * A Discord command to poll for a dinosaur wipe.
  */
-export default class DinoWipeCommand extends SlashCommand {
-  constructor(creator: SlashCreator, config: Config) {
-    super(creator, { name: "dinowipe", description: "Start a poll for an ARK dinosaur wipe." }, config);
-  }
-
+export default class DinoWipeCommand extends SlashSubCommand {
   async run(ctx: CommandContext) {
     // Prompt to choose an ARK server
     const servers = this.config.ark.servers.map((server) => ({
@@ -97,21 +86,20 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
           },
         ],
       });
-      inputCtx.registerComponent("poll_button", async (btnCtx) => await this.startPoll(ctx, btnCtx, arkServer));
-      inputCtx.registerComponent("hold_btn", async (btnCtx) => await this.holdPolls(ctx, btnCtx, arkServer));
-      inputCtx.registerComponent("resume_btn", async (btnCtx) => await this.resumePolls(ctx, btnCtx, arkServer));
+      inputCtx.registerComponent("poll_button", async (btnCtx) => await this.startPoll(btnCtx, arkServer));
+      inputCtx.registerComponent("hold_btn", async (btnCtx) => await this.holdPolls(btnCtx, arkServer));
+      inputCtx.registerComponent("resume_btn", async (btnCtx) => await this.resumePolls(btnCtx, arkServer));
     });
   }
 
   /**
    * Start a dinosaur wipe poll.
    *
-   * @param ctx Slash command context.
    * @param btnCtx Button component context.
    * @param arkServer The chosen ARK server.
    */
-  async startPoll(ctx: CommandContext, btnCtx: ComponentContext, arkServer: ArkServer) {
-    const user = btnCtx.user;
+  async startPoll(btnCtx: ComponentContext, arkServer: ArkServer) {
+    const { user } = btnCtx;
     await btnCtx.acknowledge();
     log.debug("@%s is starting a new dino wipe poll on %s...", user.username, arkServer.label, labels.ark);
 
@@ -142,7 +130,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
     // NB: Discord has a minimum of 1hr, so we'll have to manually end it ourselves
     setTimeout(async () => {
       // End the poll
-      const channel = (await (this.client as Client).channels.fetch(pollMessage.channelID))!;
+      const channel = (await this.client.channels.fetch(pollMessage.channelID))!;
       const message = await (channel as TextChannel).messages.endPoll(pollMessage.id);
       await sleep(10_000); /* NB: Discord will send a poll results message shortly after closing, let's wait for it */
       // Check the poll results
@@ -193,11 +181,10 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
   /**
    * Prevent future dinosaur wipe polls.
    *
-   * @param ctx Slash command context.
    * @param btnCtx Button component context.
    * @param arkServer The chosen ARK server.
    */
-  async holdPolls(ctx: CommandContext, btnCtx: ComponentContext, arkServer: ArkServer) {
+  async holdPolls(btnCtx: ComponentContext, arkServer: ArkServer) {
     await btnCtx.acknowledge();
     await db
       .insert(arkDinoWipeBlocks)
@@ -233,11 +220,10 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
   /**
    * Resume future dinosaur wipe polls.
    *
-   * @param ctx Slash command context.
    * @param btnCtx Button component context.
    * @param arkServer The chosen ARK server.
    */
-  async resumePolls(ctx: CommandContext, btnCtx: ComponentContext, arkServer: ArkServer) {
+  async resumePolls(btnCtx: ComponentContext, arkServer: ArkServer) {
     await btnCtx.acknowledge();
     await db
       .delete(arkDinoWipeBlocks)

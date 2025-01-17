@@ -8,14 +8,14 @@ import chalk from "chalk";
 import { type Client, GatewayDispatchEvents } from "discord.js";
 import { GatewayServer, type SlashCreator } from "slash-create";
 import type { SlashCommand } from "./cmd";
-import DinoWipeCommand from "./cmd/dinowipe.ts";
+import ArkCommand from "./cmd/ark";
 import type { Config } from "./config";
 import { labels, log } from "./logging";
 
 /**
  * A collection of all available Discord slash commands.
  */
-export const ALL_COMMANDS: (new (creator: SlashCreator, config: Config) => SlashCommand)[] = [DinoWipeCommand];
+export const ALL_COMMANDS: (new (creator: SlashCreator, config: Config) => SlashCommand)[] = [ArkCommand];
 
 /**
  * Registers and syncs all Discord slash commands.
