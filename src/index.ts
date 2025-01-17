@@ -1,5 +1,5 @@
 /**
- * @file HLN-A - a Discord bot for unofficial ARK Survival Ascended clusters.
+ * @file HLN-A - a Discord bot that serves us well
  * @author Jonathan Hiles <jonathan@hil.es>
  */
 
