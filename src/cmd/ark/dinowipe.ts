@@ -164,7 +164,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
       } else {
         // The dino wipe will go ahead
         log.info("@%s's dino wipe poll on %s won", user.username, arkServer.label, labels.ark);
-        await message.reply({
+        const feedback = await message.reply({
           content: this.config.ark.dinowipe.ping ? `<@&${this.config.ark.dinowipe.ping}> —` : "",
           embeds: [
             {
@@ -173,7 +173,17 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
             },
           ],
         });
-        await performDinoWipe(arkServer);
+        await performDinoWipe(arkServer)
+          .then(async () => log.info("The dino wipe on %s was successful!", arkServer.label, labels.ark))
+          .catch(async (err) => {
+            log.error("Could not perform dino wipe: %s", err, labels.ark);
+            await feedback.edit({
+              content: this.config.ark.dinowipe.ping ? `<@&${this.config.ark.dinowipe.ping}> —` : "",
+              embeds: [
+                { description: `We couldn't reach **${arkServer.label}**, please try again later!`, color: Colors.Red },
+              ],
+            });
+          });
       }
     }, this.config.ark.dinowipe.pollDuration * 1_000);
   }
@@ -278,11 +288,10 @@ export function getTimestamp(date: Date, format: "R" | "D" | "d" | "T" | "t" | "
  *
  * @param arkServer The ARK server config to dino wipe.
  */
-export async function performDinoWipe(arkServer: ArkServer) {
+export async function performDinoWipe(arkServer: ArkServer): Promise<void> {
   // Check if this server has RCON configured
   if (!arkServer.rcon_ip || !arkServer.rcon_port || !arkServer.rcon_password) {
-    log.warn(`The ${arkServer.label} ARK server does not have a valid RCON configuration!`, labels.ark);
-    return;
+    throw new Error(`The ${arkServer.label} ARK server does not have a valid RCON configuration!`);
   }
 
   // Connect a new RCON client
@@ -291,38 +300,45 @@ export async function performDinoWipe(arkServer: ArkServer) {
   Object.defineProperty(client, "challenge", { value: false, writable: true });
 
   // Execute the commands on the ARK server
-  client.on("auth", async () => {
-    log.info("(%s) RCON connected", arkServer.name, labels.ark);
-    // Countdown in-game
-    client.send("ServerChat All wild dinosaurs will be killed in 60 seconds...");
-    await sleep(30_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 30 seconds...");
-    await sleep(20_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 10 seconds...");
-    await sleep(5_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 5 seconds...");
-    await sleep(1_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 4 seconds...");
-    await sleep(1_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 3 seconds...");
-    await sleep(1_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 2 seconds...");
-    await sleep(1_000);
-    client.send("ServerChat All wild dinosaurs will be killed in 1 second...");
-    await sleep(1_000);
-    // Destroy wild dinosaurs
-    client.send("DestroyWildDinos");
-    await sleep(3_000);
-    client.send("ServerChat All wild dinosaurs have been killed!");
-    // Disconnect shortly after
-    await sleep(1_000);
-    client.disconnect();
-  });
-  client.on("response", async (msg: string) => log.debug("(%s) %s", arkServer.name, msg, labels.ark));
-  client.on("error", async (error) => log.error("(%s) %s", arkServer.name, error, labels.ark));
-  client.on("end", async () => log.info("(%s) RCON disconnected", arkServer.name, labels.ark));
+  return await new Promise((resolve, reject) => {
+    client.on("auth", async () => {
+      log.info("(%s) RCON connected", arkServer.name, labels.ark);
+      // Countdown in-game
+      client.send("ServerChat All wild dinosaurs will be killed in 60 seconds...");
+      await sleep(30_000);
+      client.send("ServerChat All wild dinosaurs will be killed in 30 seconds...");
+      await sleep(20_000);
+      client.send("ServerChat All wild dinosaurs will be killed in 10 seconds...");
+      await sleep(5_000);
+      client.send("ServerChat All wild dinosaurs will be killed in 5 seconds...");
+      await sleep(1_000);
+      client.send("ServerChat All wild dinosaurs will be killed in 4 seconds...");
+      await sleep(1_000);
+      client.send("ServerChat All wild dinosaurs will be killed in 3 seconds...");
+      await sleep(1_000);
+      client.send("ServerChat All wild dinosaurs will be killed in 2 seconds...");
+      await sleep(1_000);
+      client.send("ServerChat All wild dinosaurs will be killed in 1 second...");
+      await sleep(1_000);
+      // Destroy wild dinosaurs
+      client.send("DestroyWildDinos");
+      await sleep(3_000);
+      client.send("ServerChat All wild dinosaurs have been killed!");
+      // Disconnect shortly after
+      await sleep(1_000);
+      client.disconnect();
+      resolve();
+    });
+    client.on("response", async (msg: string) => log.debug("(%s) %s", arkServer.name, msg, labels.ark));
+    client.on("error", async (error) => log.error("(%s) %s", arkServer.name, error, labels.ark));
+    client.on("end", async () => log.info("(%s) RCON disconnected", arkServer.name, labels.ark));
 
-  // Connect and exit
-  log.info("(%s) RCON connecting...", arkServer.name, labels.ark);
-  client.connect();
+    // Connect and exit
+    log.info("(%s) RCON connecting...", arkServer.name, labels.ark);
+    client.connect();
+    setTimeout(() => {
+      client.disconnect();
+      reject(new Error("Server did not respond in time!"));
+    }, 90_000);
+  });
 }
