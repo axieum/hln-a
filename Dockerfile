@@ -2,6 +2,11 @@
 FROM oven/bun:1 AS base
 WORKDIR /usr/src/app
 
+# ↳ install Docker CLI
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends docker.io && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # install dependencies
 FROM base AS install
 
