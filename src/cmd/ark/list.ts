@@ -33,6 +33,7 @@ export default class ListCommand extends SlashSubCommand {
       content: "",
       embeds: [
         {
+          description: `**${arkServers.length}** ARKs`,
           fields: arkServers.map((arkServer) => ({
             name: `${arkServer.emoji} ${arkServer.label}`,
             value: `**Players:** ${players[arkServers.indexOf(arkServer)]}
@@ -65,10 +66,11 @@ export default class ListCommand extends SlashSubCommand {
       ]);
 
       const exitCode = await proc.exited;
-      log.debug("> %s", readableStreamToText(proc.stdout), labels.ark);
+      const stdout = (await readableStreamToText(proc.stdout)).trim();
+      log.debug("> %s", stdout, labels.ark);
 
       if (exitCode === 0) {
-        const services = proc.stdout.toString().split("\n");
+        const services = stdout.split("\n");
         log.info("found ARKs: %s", services, labels.ark);
         return services.map((service) => service.split(" / "));
       }
