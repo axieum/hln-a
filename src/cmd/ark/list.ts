@@ -12,81 +12,52 @@ import { SlashSubCommand } from "../index.ts";
 export default class ListCommand extends SlashSubCommand {
   async run(ctx: CommandContext) {
     await ctx.defer();
-
-    // Query all running ARK servers
-    const services = await this.queryRunningServers(ctx);
-    if (!services) return;
-
-    // Get the ARK server configurations
-    const arkServers: ArkServer[] = [];
-    for (const [service] of services) {
-      const arkServer = this.config.ark.servers.find((server) => server.docker_service === service);
-      if (arkServer) arkServers.push(arkServer);
-      else log.warn("ARK server %s not found in config!", service, labels.ark);
-    }
-
-    // Query the number of connected players to each running ARK server
-    const players = await Promise.all(arkServers.map(listPlayers));
-    log.debug("ARK players: %s", players, labels.ark);
-
-    await ctx.editOriginal({
-      content: "",
-      embeds: [
-        {
-          description: `**${arkServers.length}** ARKs`,
-          fields: arkServers.map((arkServer) => ({
-            name: `${arkServer.emoji} ${arkServer.label}`,
-            value: `**Players:** ${players[arkServers.indexOf(arkServer)]}
-**Uptime:** ${services.find(([service]) => service === arkServer.docker_service)?.[1].replace(" ago", "") ?? "Unknown"}
-**Memory:** 10 GB`,
-            inline: true,
-          })),
-        },
-      ],
-    });
-  }
-
-  /**
-   * Query running ARK servers.
-   *
-   * @param ctx The command context.
-   * @return An array of running ARK service names, or null if an error was encountered.
-   */
-  async queryRunningServers(ctx: CommandContext) {
     try {
-      log.debug("@%s is querying running ARK servers...", ctx.user.username, labels.ark);
-      const proc = spawn([
-        "docker",
-        "compose",
-        "-f",
-        "/home/ark/docker-compose.yaml",
-        "ps",
-        "--format",
-        "{{.Name}} / {{.RunningFor}}",
-      ]);
-
-      const exitCode = await proc.exited;
-      const stdout = (await readableStreamToText(proc.stdout)).trim();
-      log.debug("> %s", stdout, labels.ark);
-
-      if (exitCode === 0) {
-        const services = stdout.split("\n");
-        log.info("found ARKs: %s", services, labels.ark);
-        return services.map((service) => service.split(" / "));
+      // Query all running ARK servers
+      const services = await this.getDockerServices(ctx);
+      if (!services) {
+        await ctx.editOriginal({
+          content: "",
+          embeds: [
+            {
+              description: "We couldn't reach any ARKs, please try again later!",
+              color: Colors.Default,
+            },
+          ],
+          components: [],
+        });
+        return;
       }
 
-      log.error(
-        "@%s failed to query running ARK servers with exit code %d",
-        ctx.user.username,
-        proc.exitCode,
-        labels.ark,
+      // Build an embed field for each ARK server
+      const fields = await Promise.all(
+        services.map(async ([service, uptime]) => {
+          // Get the ARK server configuration
+          const arkServer = this.config.ark.servers.find((server) => server.docker_service === service);
+          if (!arkServer) {
+            log.warn("ARK server %s not found in config!", service, labels.ark);
+            return null;
+          }
+
+          // Query the number of connected players
+          const players = await listPlayers(arkServer);
+
+          // Build the embed field
+          return {
+            name: arkServer.label,
+            value: `**Players:** ${players}\n**Uptime:** ${uptime}`,
+            inline: true,
+          };
+        }),
       );
+
       await ctx.editOriginal({
         content: "",
         embeds: [
           {
-            description: "We tried to query running ARKs but failed, please try again later!",
-            color: Colors.Red,
+            description: "",
+            fields: fields.filter((f) => !!f),
+            color: Colors.Default,
           },
         ],
         components: [],
@@ -104,8 +75,40 @@ export default class ListCommand extends SlashSubCommand {
         components: [],
       });
     }
+  }
 
-    return null;
+  /**
+   * Query running ARK servers.
+   *
+   * @param ctx The command context.
+   * @return An array of running ARK service names, or null if an error was encountered.
+   */
+  async getDockerServices(ctx: CommandContext) {
+    log.debug("@%s is querying running ARK servers...", ctx.user.username, labels.ark);
+    const proc = spawn([
+      "docker",
+      "compose",
+      "-f",
+      "/home/ark/docker-compose.yaml",
+      "ps",
+      "--format",
+      "{{.Name}} | {{.RunningFor}}",
+    ]);
+
+    const exitCode = await proc.exited;
+    const stdout = (await readableStreamToText(proc.stdout)).trim();
+    log.debug("> %s", stdout, labels.ark);
+    if (exitCode !== 0) {
+      throw new Error(`Failed to query running ARK servers with exit code ${proc.exitCode}!`);
+    }
+
+    // Return [['ark-ragnarok', '3 days'], ...]
+    const arks = stdout
+      .split("\n")
+      .map((line) => line.trim().split(" | "))
+      .map(([service, uptime]) => [service, uptime.replace(" ago", "").trim()]);
+    log.info("found ARKs: %s", arks, labels.ark);
+    return arks;
   }
 }
 
@@ -137,7 +140,12 @@ export async function listPlayers(arkServer: ArkServer): Promise<string> {
     });
     client.on("response", async (msg: string) => {
       log.debug("(%s) %s", arkServer.name, msg, labels.ark);
-      resolve(msg);
+      resolve(
+        msg
+          .trim()
+          .toLowerCase()
+          .replace(/^./, (c) => c.toUpperCase()),
+      );
     });
     client.on("error", async (error) => log.error("(%s) %s", arkServer.name, error, labels.ark));
     client.on("end", async () => log.info("(%s) RCON disconnected", arkServer.name, labels.ark));
