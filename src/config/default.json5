@@ -4,11 +4,11 @@
    */
   "client": {
     // Bot → Token
-    "token": null,
+    "token": "",
     // General Information → Public Key
-    "publicKey": null,
+    "publicKey": "",
     // General Information → Application ID
-    "applicationId": null
+    "applicationId": ""
   },
   /*
    * ARK: Survival Ascended
@@ -18,39 +18,89 @@
     "servers": [
       {
         // The name of the ARK server
+        "name": "Club ARK",
+        // An emoji that represents the ARK server
+        "emoji": "🏠",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-bobs-missions",
+        // The RCON port used to connect
+        "rcon_port": 27020
+      },
+      {
+        // The name of the ARK server
         "name": "The Island",
         // An emoji that represents the ARK server
-        "emoji": "🏝️"
+        "emoji": "🏝️",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-the-island",
+        // The RCON port used to connect
+        "rcon_port": 27021
       },
       {
         // The name of the ARK server
         "name": "Scorched Earth",
         // An emoji that represents the ARK server
-        "emoji":  "🏜️"
+        "emoji": "🏜️",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-scorched-earth",
+        // The RCON port used to connect
+        "rcon_port": 27022
       },
       {
         // The name of the ARK server
         "name": "The Center",
         // An emoji that represents the ARK server
-        "emoji":  "🌋"
+        "emoji": "🌋",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-the-center",
+        // The RCON port used to connect
+        "rcon_port": 27023
       },
       {
         // The name of the ARK server
         "name": "Aberration",
         // An emoji that represents the ARK server
-        "emoji":  "🕳️"
+        "emoji": "🕳️",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-aberration",
+        // The RCON port used to connect
+        "rcon_port": 27024
       },
       {
         // The name of the ARK server
         "name": "Extinction",
         // An emoji that represents the ARK server
-        "emoji":  "🌆"
+        "emoji": "🌆",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-extinction",
+        // The RCON port used to connect
+        "rcon_port": 27025
+      },
+      {
+        // The name of the ARK server
+        "name": "Astraeos",
+        // An emoji that represents the ARK server
+        "emoji": "🏛️",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-astraeos",
+        // The RCON port used to connect
+        "rcon_port": 27026
+      },
+      {
+        // The name of the ARK server
+        "name": "Ragnarok",
+        // An emoji that represents the ARK server
+        "emoji": "🐲",
+        // The Docker service name of the ARK server
+        "docker_service": "ark-ragnarok",
+        // The RCON port used to connect
+        "rcon_port": 27027
       }
     ],
     // Dinosaur wipe options
     "dinowipe": {
       // An optional ID of the discord role to ping for updates
-      "ping": null,
+      "ping": "",
       // The number of seconds that the poll runs for
       "pollDuration": 300,
       // The number of seconds between dino wipes

@@ -7,6 +7,8 @@ export const arkServerSchema = z
     name: z.string().nonempty(),
     // An emoji that represents the ARK server
     emoji: z.string().emoji(),
+    // The Docker service name of the ARK server
+    docker_service: z.string().nonempty(),
     // The RCON IP address used to execute commands
     rcon_ip: z.string().optional(),
     // The RCON port used to connect
