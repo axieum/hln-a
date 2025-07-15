@@ -53,13 +53,7 @@ export default class ListCommand extends SlashSubCommand {
 
       await ctx.editOriginal({
         content: "",
-        embeds: [
-          {
-            description: "",
-            fields: fields.filter((f) => !!f),
-            color: Colors.Default,
-          },
-        ],
+        embeds: [{ description: "", fields: fields.filter((f) => !!f) }],
         components: [],
       });
     } catch (err) {
@@ -103,12 +97,10 @@ export default class ListCommand extends SlashSubCommand {
     }
 
     // Return [['ark-ragnarok', '3 days'], ...]
-    const arks = stdout
+    return stdout
       .split("\n")
       .map((line) => line.trim().split(" | "))
       .map(([service, uptime]) => [service, uptime.replace(" ago", "").trim()]);
-    log.info("found ARKs: %s", arks, labels.ark);
-    return arks;
   }
 }
 
