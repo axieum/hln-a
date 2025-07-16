@@ -45,61 +45,49 @@ export default class RestartCommand extends SlashSubCommand {
         },
       ],
     });
-    ctx.registerComponent("restart_button", async (btnCtx) => await this.restartArk(btnCtx, arkServer));
+    ctx.registerComponent("restart_button", async (btnCtx) => await restartArk(btnCtx, arkServer));
     ctx.registerComponent("cancel_button", async (btnCtx) => await btnCtx.delete());
   }
+}
 
-  /**
-   * Perform an ARK server restart.
-   *
-   * @param btnCtx Button component context.
-   * @param arkServer The chosen ARK server.
-   */
-  async restartArk(btnCtx: ComponentContext, arkServer: ArkServer) {
-    const { user } = btnCtx;
-    await btnCtx.acknowledge();
-    log.debug("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
+/**
+ * Perform an ARK server restart.
+ *
+ * @param btnCtx Button component context.
+ * @param arkServer The chosen ARK server.
+ */
+export async function restartArk(btnCtx: ComponentContext, arkServer: ArkServer) {
+  const { user } = btnCtx;
+  await btnCtx.acknowledge();
+  log.debug("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
 
-    try {
-      const proc = spawn([
-        "docker",
-        "compose",
-        "-f",
-        "/home/ark/docker-compose.yaml",
-        "restart",
-        arkServer.docker_service,
-      ]);
+  try {
+    const proc = spawn([
+      "docker",
+      "compose",
+      "-f",
+      "/home/ark/docker-compose.yaml",
+      "restart",
+      arkServer.docker_service,
+    ]);
 
-      const exitCode = await proc.exited;
-      log.debug("> %s", readableStreamToText(proc.stdout), labels.ark);
+    const exitCode = await proc.exited;
+    log.debug("> %s", readableStreamToText(proc.stdout), labels.ark);
 
-      if (exitCode === 0) {
-        log.info("@%s restarted %s", user.username, arkServer.label, labels.ark);
-        await btnCtx.editOriginal({
-          content: "",
-          embeds: [
-            {
-              description: `You just restarted **${arkServer.label}**, please wait a few minutes for it to appear.`,
-              color: Colors.Green,
-            },
-          ],
-          components: [],
-        });
-      } else {
-        log.error("@%s failed to restart %s with exit code", user.username, arkServer.label, proc.exitCode, labels.ark);
-        await btnCtx.editOriginal({
-          content: "",
-          embeds: [
-            {
-              description: `We tried to restart **${arkServer.label}** but failed, please try again later!`,
-              color: Colors.Red,
-            },
-          ],
-          components: [],
-        });
-      }
-    } catch (err) {
-      log.error("@%s failed to restart %s: %s", user.username, arkServer.label, err, labels.ark);
+    if (exitCode === 0) {
+      log.info("@%s restarted %s", user.username, arkServer.label, labels.ark);
+      await btnCtx.editOriginal({
+        content: "",
+        embeds: [
+          {
+            description: `You just restarted **${arkServer.label}**, please wait a few minutes for it to appear.`,
+            color: Colors.Green,
+          },
+        ],
+        components: [],
+      });
+    } else {
+      log.error("@%s failed to restart %s with exit code", user.username, arkServer.label, proc.exitCode, labels.ark);
       await btnCtx.editOriginal({
         content: "",
         embeds: [
@@ -111,5 +99,17 @@ export default class RestartCommand extends SlashSubCommand {
         components: [],
       });
     }
+  } catch (err) {
+    log.error("@%s failed to restart %s: %s", user.username, arkServer.label, err, labels.ark);
+    await btnCtx.editOriginal({
+      content: "",
+      embeds: [
+        {
+          description: `We tried to restart **${arkServer.label}** but failed, please try again later!`,
+          color: Colors.Red,
+        },
+      ],
+      components: [],
+    });
   }
 }
