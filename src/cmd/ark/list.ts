@@ -34,12 +34,14 @@ export default class ListCommand extends SlashSubCommand {
           }
 
           // Query the number of connected players
-          const players = await listPlayers(arkServer);
+          const players = await listPlayers(arkServer).then((players) =>
+            players.length > 0 ? `${players.join("\n")}` : "No players",
+          );
 
           // Build the embed field
           return {
             name: arkServer.label,
-            value: `**Players:**\n${players}\n**Uptime:** ${uptime}`,
+            value: `**Players:** ${players}\n**Uptime:** ${uptime}`,
             inline: true,
           };
         }),
