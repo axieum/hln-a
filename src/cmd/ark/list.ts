@@ -1,16 +1,17 @@
-import { readableStreamToText, spawn } from "bun";
+import { readableStreamToText, sleep, spawn } from "bun";
 import { Colors } from "discord.js";
-import type { CommandContext } from "slash-create";
+import { type CommandContext, InteractionResponseFlags } from "slash-create";
+import Rcon from "ts-rcon";
+import type { ArkServer } from "../../config/ark.ts";
 import { labels, log } from "../../logging.ts";
 import { SlashSubCommand } from "../index.ts";
-import { listPlayers } from "./listplayers.ts";
 
 /**
  * A Discord command to list running ARK servers.
  */
 export default class ListCommand extends SlashSubCommand {
   async run(ctx: CommandContext) {
-    await ctx.defer();
+    await ctx.defer(InteractionResponseFlags.EPHEMERAL);
     try {
       // Query all running ARK servers
       const services = await getDockerServices(ctx);
@@ -102,4 +103,45 @@ export async function getDockerServices(ctx: CommandContext) {
     .split("\n")
     .map((line) => line.trim().split(" | "))
     .map(([service, uptime]) => [service, uptime.replace(" ago", "").trim()]);
+}
+
+/**
+ * Executes the `ListPlayers` command on the given ARK server.
+ *
+ * @param arkServer The ARK server config to list players.
+ * @return A list of player names.
+ */
+export async function listPlayers(arkServer: ArkServer) {
+  // Check if this server has RCON configured
+  if (!arkServer.rcon_ip || !arkServer.rcon_port || !arkServer.rcon_password) {
+    throw new Error(`The ${arkServer.label} ARK server does not have a valid RCON configuration!`);
+  }
+
+  // Connect a new RCON client
+  const client = new Rcon(arkServer.rcon_ip, arkServer.rcon_port, arkServer.rcon_password);
+  Object.defineProperty(client, "rconId", { value: 0, writable: true });
+  Object.defineProperty(client, "challenge", { value: false, writable: true });
+
+  return await new Promise((resolve: (value: string[]) => void, reject) => {
+    // Execute the commands on the ARK server
+    client.on("auth", async () => {
+      log.info("(%s) RCON connected", arkServer.name, labels.ark);
+      client.send("ListPlayers");
+      await sleep(1_000);
+      client.disconnect();
+    });
+    client.on("response", async (msg: string) =>
+      resolve([...msg.matchAll(/^(\d+)\. ([^,]+), \w+/gm)].map((entry) => entry[2])),
+    );
+    client.on("error", async (error) => log.error("(%s) %s", arkServer.name, error, labels.ark));
+    client.on("end", async () => log.info("(%s) RCON disconnected", arkServer.name, labels.ark));
+
+    // Connect and exit
+    log.info("(%s) RCON connecting...", arkServer.name, labels.ark);
+    client.connect();
+    setTimeout(() => {
+      client.disconnect();
+      reject(new Error("Server did not respond in time!"));
+    }, 10_000);
+  });
 }
