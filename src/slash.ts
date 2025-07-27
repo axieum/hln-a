@@ -43,7 +43,7 @@ export async function syncSlashCommands(creator: SlashCreator, config: Config): 
     .on("commandRun", (cmd, _, ctx) =>
       log.info(
         "%s ran command %s",
-        chalk.bold(`@${ctx.user.username}}`),
+        chalk.bold(`@${ctx.user.username}`),
         chalk.underline(`/${cmd.commandName}${ctx.subcommands.length > 0 ? ` ${ctx.subcommands.join(" ")}` : ""}`),
         labels.commands,
       ),
