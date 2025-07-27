@@ -58,8 +58,8 @@ export default class RestartCommand extends SlashSubCommand {
  */
 export async function restartArk(btnCtx: ComponentContext, arkServer: ArkServer) {
   const { user } = btnCtx;
-  await btnCtx.acknowledge();
-  log.debug("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
+  await btnCtx.defer();
+  log.info("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
 
   try {
     const proc = spawn([
