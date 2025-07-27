@@ -129,6 +129,8 @@
         "rcon_password": ""
       }
     ],
+    // The maximum number of simultaneously running ARK servers
+    "maxServers": 2,
     // Dinosaur wipe options
     "dinowipe": {
       // An optional ID of the discord role to ping for updates

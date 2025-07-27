@@ -29,6 +29,8 @@ export type ArkServer = z.infer<typeof arkServerSchema>;
 export const arkSchema = z.object({
   // A list of available ARK servers
   servers: z.array(arkServerSchema),
+  // The maximum number of simultaneously running ARK servers
+  maxServers: z.number().int().default(2),
   // Dinosaur wipe options
   dinowipe: z.object({
     // An optional ID of the discord role to ping for updates
