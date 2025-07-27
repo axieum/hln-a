@@ -4,6 +4,7 @@ import { SlashCommand } from "../index.ts";
 import DinoWipeCommand from "./dinowipe.ts";
 import ListCommand from "./list.ts";
 import RestartCommand from "./restart.ts";
+import StopCommand from "./stop.ts";
 
 /**
  * A Discord command for interacting with an ARK: Survival Ascended cluster.
@@ -57,6 +58,21 @@ export default class ArkCommand extends SlashCommand {
               },
             ],
           },
+          // `/ark stop` - Stop an ARK server.
+          {
+            type: CommandOptionType.SUB_COMMAND,
+            name: "stop",
+            description: "Stop an ARK server.",
+            options: [
+              {
+                type: CommandOptionType.STRING,
+                name: "server",
+                description: "The ARK server to stop.",
+                required: true,
+                choices: serverChoices,
+              },
+            ],
+          },
         ],
       },
       config,
@@ -73,6 +89,9 @@ export default class ArkCommand extends SlashCommand {
         break;
       case "restart":
         await new RestartCommand(this, ctx, this.config).run(ctx);
+        break;
+      case "stop":
+        await new StopCommand(this, ctx, this.config).run(ctx);
         break;
     }
   }
