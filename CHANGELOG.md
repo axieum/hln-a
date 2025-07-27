@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/axieum/hln-a/compare/v1.2.0...v1.3.0) (2025-07-27)
+
+
+### Features
+
+* **ark:** add `/ark start` command ([285bcbd](https://github.com/axieum/hln-a/commit/285bcbdf04d58c4b05ebd542934716fd41961945))
+* **ark:** add `/ark stop` command ([0aaf3a7](https://github.com/axieum/hln-a/commit/0aaf3a78da1a4c392e6dab2e6cf64cecce0465f9))
+
 ## [1.2.0](https://github.com/axieum/hln-a/compare/v1.1.1...v1.2.0) (2025-07-27)
 
 
