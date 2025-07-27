@@ -20,6 +20,17 @@ export default class RestartCommand extends SlashSubCommand {
       return;
     }
 
+    // Check that the ARK is actually running
+    if (!(await getDockerServices(ctx)).find(([service]) => service === arkServer.docker_service)) {
+      log.info("@%s tried to restart %s but it was offline", ctx.user.username, arkServer.label, labels.ark);
+      await ctx.editOriginal({
+        content: "",
+        embeds: [{ description: `You can't restart **${arkServer.label}** as it is offline!`, color: Colors.Red }],
+        components: [],
+      });
+      return;
+    }
+
     // Prompt for an action
     await ctx.editOriginal({
       content: `Are you sure you want to restart **${arkServer.label}**?`,
@@ -62,18 +73,6 @@ export async function restartArk(btnCtx: ComponentContext, arkServer: ArkServer)
   await btnCtx.acknowledge();
   log.info("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
 
-  // Check that the ARK is actually running
-  if (!(await getDockerServices(btnCtx)).find(([service]) => service === arkServer.docker_service)) {
-    log.info("@%s tried to restart %s but it was offline", user.username, arkServer.label, labels.ark);
-    await btnCtx.editOriginal({
-      content: "",
-      embeds: [{ description: `We tried to restart **${arkServer.label}** but it was offline!`, color: Colors.Red }],
-      components: [],
-    });
-    return;
-  }
-
-  // The ARK is running, go ahead and restart it
   try {
     const proc = spawn([
       "docker",
