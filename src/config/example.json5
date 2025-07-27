@@ -24,11 +24,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-bobs-missions",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27020,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       },
       {
         // The name of the ARK server
@@ -38,11 +38,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-the-island",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27021,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       },
       {
         // The name of the ARK server
@@ -52,11 +52,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-scorched-earth",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27022,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       },
       {
         // The name of the ARK server
@@ -66,11 +66,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-the-center",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27023,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       },
       {
         // The name of the ARK server
@@ -80,11 +80,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-aberration",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27024,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       },
       {
         // The name of the ARK server
@@ -94,11 +94,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-extinction",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27025,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       },
       {
         // The name of the ARK server
@@ -108,11 +108,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-astraeos",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27026,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       },
       {
         // The name of the ARK server
@@ -122,11 +122,11 @@
         // The Docker service name of the ARK server
         "docker_service": "ark-ragnarok",
         // The RCON IP address used to execute commands
-        rcon_ip: "",
+        "rcon_ip": "",
         // The RCON port used to connect
         "rcon_port": 27027,
         // The RCON admin password used to authenticate
-        rcon_password: ""
+        "rcon_password": ""
       }
     ],
     // Dinosaur wipe options
