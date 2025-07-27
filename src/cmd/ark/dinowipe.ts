@@ -89,7 +89,7 @@ ${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${ge
   async startPoll(btnCtx: ComponentContext, arkServer: ArkServer) {
     const { user } = btnCtx;
     await btnCtx.acknowledge();
-    log.debug("@%s is starting a new dino wipe poll on %s...", user.username, arkServer.label, labels.ark);
+    log.info("@%s is starting a new dino wipe poll on %s...", user.username, arkServer.label, labels.ark);
 
     // Send some instructions
     await btnCtx.editOriginal({
