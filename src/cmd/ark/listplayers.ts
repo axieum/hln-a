@@ -23,10 +23,7 @@ export default class ListPlayersCommand extends SlashSubCommand {
     // Query the ARK server
     log.info("@%s's is querying online players on %s...", ctx.user.username, arkServer.label, labels.ark);
     await listPlayers(arkServer)
-      .then((players) => {
-        if (players === undefined) throw new Error("Invalid response from server!");
-        return players;
-      })
+      .then((players) => players.map((player, index) => `${index + 1}. **${player}**`))
       .then(async (players) => {
         await ctx.send({
           embeds: [
@@ -57,6 +54,7 @@ export default class ListPlayersCommand extends SlashSubCommand {
  * Executes the `ListPlayers` command on the given ARK server.
  *
  * @param arkServer The ARK server config to list players.
+ * @return A list of player names.
  */
 export async function listPlayers(arkServer: ArkServer) {
   // Check if this server has RCON configured
@@ -78,7 +76,7 @@ export async function listPlayers(arkServer: ArkServer) {
       client.disconnect();
     });
     client.on("response", async (msg: string) =>
-      resolve([...msg.matchAll(/^(\d+)\. ([^,]+), \w+/gm)].map((entry, i) => `${i + 1}. **${entry[2]}**`)),
+      resolve([...msg.matchAll(/^(\d+)\. ([^,]+), \w+/gm)].map((entry) => entry[2])),
     );
     client.on("error", async (error) => log.error("(%s) %s", arkServer.name, error, labels.ark));
     client.on("end", async () => log.info("(%s) RCON disconnected", arkServer.name, labels.ark));
