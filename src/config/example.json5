@@ -126,7 +126,7 @@
         // The RCON port used to connect
         "rcon_port": 27027,
         // The RCON admin password used to authenticate
-        rcon_password: "",
+        rcon_password: ""
       }
     ],
     // Dinosaur wipe options
