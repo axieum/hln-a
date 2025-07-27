@@ -77,7 +77,7 @@ export default class ListCommand extends SlashSubCommand {
  * @return An array of running ARK service names.
  */
 export async function getDockerServices(ctx: CommandContext) {
-  log.debug("@%s is querying running ARK servers...", ctx.user.username, labels.ark);
+  log.info("@%s is querying running ARK servers...", ctx.user.username, labels.ark);
   const proc = spawn([
     "docker",
     "compose",

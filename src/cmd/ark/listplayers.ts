@@ -21,7 +21,7 @@ export default class ListPlayersCommand extends SlashSubCommand {
     }
 
     // Query the ARK server
-    log.info("@%s's is querying online players on %s...", ctx.user.username, arkServer.label, labels.ark);
+    log.info("@%s is querying players on %s...", ctx.user.username, arkServer.label, labels.ark);
     await listPlayers(arkServer)
       .then((players) => players.map((player, index) => `${index + 1}. **${player}**`))
       .then(async (players) => {
