@@ -4,6 +4,7 @@ import { SlashCommand } from "../index.ts";
 import DinoWipeCommand from "./dinowipe.ts";
 import ListCommand from "./list.ts";
 import RestartCommand from "./restart.ts";
+import StartCommand from "./start.ts";
 import StopCommand from "./stop.ts";
 
 /**
@@ -58,6 +59,21 @@ export default class ArkCommand extends SlashCommand {
               },
             ],
           },
+          // `/ark start` - Start an ARK server.
+          {
+            type: CommandOptionType.SUB_COMMAND,
+            name: "start",
+            description: "Start an ARK server.",
+            options: [
+              {
+                type: CommandOptionType.STRING,
+                name: "server",
+                description: "The ARK server to start.",
+                required: true,
+                choices: serverChoices,
+              },
+            ],
+          },
           // `/ark stop` - Stop an ARK server.
           {
             type: CommandOptionType.SUB_COMMAND,
@@ -89,6 +105,9 @@ export default class ArkCommand extends SlashCommand {
         break;
       case "restart":
         await new RestartCommand(this, ctx, this.config).run(ctx);
+        break;
+      case "start":
+        await new StartCommand(this, ctx, this.config).run(ctx);
         break;
       case "stop":
         await new StopCommand(this, ctx, this.config).run(ctx);
