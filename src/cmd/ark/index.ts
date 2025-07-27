@@ -26,6 +26,15 @@ export default class ArkCommand extends SlashCommand {
             type: CommandOptionType.SUB_COMMAND,
             name: "dinowipe",
             description: "Start a poll for an ARK dinosaur wipe.",
+            options: [
+              {
+                type: CommandOptionType.STRING,
+                name: "server",
+                description: "The ARK server to dino wipe.",
+                required: true,
+                choices: serverChoices,
+              },
+            ],
           },
           // `/ark list` - List running ARK servers.
           {

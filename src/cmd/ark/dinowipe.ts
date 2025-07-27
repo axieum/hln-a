@@ -14,82 +14,70 @@ import { SlashSubCommand } from "../index.ts";
  */
 export default class DinoWipeCommand extends SlashSubCommand {
   async run(ctx: CommandContext) {
-    // Prompt to choose an ARK server
-    const servers = this.config.ark.servers.map((server) => ({
-      label: server.name,
-      value: server.name,
-      emoji: { name: server.emoji },
-    }));
-    await ctx.send({
-      content: "Choose an ARK server",
+    await ctx.defer();
+
+    // Get the chosen ARK server
+    const arkServer = this.config.ark.servers.find((server) => server.name === ctx.options.restart.server);
+    if (!arkServer) {
+      await ctx.editOriginal({ content: `That ARK server doesn't exist!`, components: [] });
+      return;
+    }
+
+    // Check if there was recently a winning poll
+    const polls = await db
+      .select()
+      .from(arkDinoWipes)
+      .where(and(eq(arkDinoWipes.server, arkServer.name), eq(arkDinoWipes.success, true)))
+      .orderBy(desc(arkDinoWipes.created_at));
+    let nextPollAt =
+      polls.length > 0 ? new Date(polls[0].created_at.getTime() + this.config.ark.dinowipe.cooldown * 1_000) : null;
+    if (nextPollAt && nextPollAt <= new Date()) nextPollAt = null;
+
+    // Check if there are any holds in place
+    const holds = await db.select().from(arkDinoWipeBlocks).where(eq(arkDinoWipeBlocks.server, arkServer.name));
+
+    // Prompt for an action
+    await ctx.editOriginal({
+      content: `${holds.length === 0 && !nextPollAt ? `Would you like to dino wipe **${arkServer.label}**?` : ""}
+${holds.length > 0 ? `<@${holds[0].user_id}> is preventing dino wipes on **${arkServer.label}** — ${getTimestamp(holds[0].created_at, "R")}` : ""}
+${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${getTimestamp(nextPollAt, "R")}` : ""}`.trim(),
       components: [
         {
           type: ComponentType.ACTION_ROW,
-          components: [{ type: ComponentType.STRING_SELECT, custom_id: "server_input", options: servers }],
+          components: [
+            // Start a dinosaur wipe poll
+            {
+              type: ComponentType.BUTTON,
+              style: ButtonStyle.PRIMARY,
+              custom_id: "poll_button",
+              label: "Start Poll",
+              emoji: { name: "🙋" },
+              disabled: holds.length > 0 || nextPollAt !== null,
+            },
+            holds.length === 0
+              ? // Prevent future dinosaur wipe polls
+                {
+                  type: ComponentType.BUTTON,
+                  style: ButtonStyle.SECONDARY,
+                  custom_id: "hold_btn",
+                  label: "Hold",
+                  emoji: { name: "⏸️" },
+                }
+              : // Resume future dinosaur wipe polls
+                {
+                  type: ComponentType.BUTTON,
+                  style: ButtonStyle.SUCCESS,
+                  custom_id: "resume_btn",
+                  label: "Resume",
+                  emoji: { name: "▶️" },
+                },
+          ],
         },
       ],
     });
-    ctx.registerComponent("server_input", async (inputCtx) => {
-      // Validate the chosen ARK server
-      const arkServer = this.config.ark.servers.find((server) => server.name === inputCtx.values[0]);
-      if (!arkServer) return await inputCtx.editOriginal({ content: `That ARK server doesn't exist!`, components: [] });
-
-      // Check if there was recently a winning poll
-      const polls = await db
-        .select()
-        .from(arkDinoWipes)
-        .where(and(eq(arkDinoWipes.server, arkServer.name), eq(arkDinoWipes.success, true)))
-        .orderBy(desc(arkDinoWipes.created_at));
-      let nextPollAt =
-        polls.length > 0 ? new Date(polls[0].created_at.getTime() + this.config.ark.dinowipe.cooldown * 1_000) : null;
-      if (nextPollAt && nextPollAt <= new Date()) nextPollAt = null;
-
-      // Check if there are any holds in place
-      const holds = await db.select().from(arkDinoWipeBlocks).where(eq(arkDinoWipeBlocks.server, arkServer.name));
-
-      // Prompt for an action
-      await inputCtx.editOriginal({
-        content: `${holds.length === 0 && !nextPollAt ? `Would you like to dino wipe **${arkServer.label}**?` : ""}
-${holds.length > 0 ? `<@${holds[0].user_id}> is preventing dino wipes on **${arkServer.label}** — ${getTimestamp(holds[0].created_at, "R")}` : ""}
-${nextPollAt ? `You can ask for another dino wipe on **${arkServer.label}** ${getTimestamp(nextPollAt, "R")}` : ""}`.trim(),
-        components: [
-          {
-            type: ComponentType.ACTION_ROW,
-            components: [
-              // Start a dinosaur wipe poll
-              {
-                type: ComponentType.BUTTON,
-                style: ButtonStyle.PRIMARY,
-                custom_id: "poll_button",
-                label: "Start Poll",
-                emoji: { name: "🙋" },
-                disabled: holds.length > 0 || nextPollAt !== null,
-              },
-              holds.length === 0
-                ? // Prevent future dinosaur wipe polls
-                  {
-                    type: ComponentType.BUTTON,
-                    style: ButtonStyle.SECONDARY,
-                    custom_id: "hold_btn",
-                    label: "Hold",
-                    emoji: { name: "⏸️" },
-                  }
-                : // Resume future dinosaur wipe polls
-                  {
-                    type: ComponentType.BUTTON,
-                    style: ButtonStyle.SUCCESS,
-                    custom_id: "resume_btn",
-                    label: "Resume",
-                    emoji: { name: "▶️" },
-                  },
-            ],
-          },
-        ],
-      });
-      inputCtx.registerComponent("poll_button", async (btnCtx) => await this.startPoll(btnCtx, arkServer));
-      inputCtx.registerComponent("hold_btn", async (btnCtx) => await this.holdPolls(btnCtx, arkServer));
-      inputCtx.registerComponent("resume_btn", async (btnCtx) => await this.resumePolls(btnCtx, arkServer));
-    });
+    ctx.registerComponent("poll_button", async (btnCtx) => await this.startPoll(btnCtx, arkServer));
+    ctx.registerComponent("hold_btn", async (btnCtx) => await this.holdPolls(btnCtx, arkServer));
+    ctx.registerComponent("resume_btn", async (btnCtx) => await this.resumePolls(btnCtx, arkServer));
   }
 
   /**
