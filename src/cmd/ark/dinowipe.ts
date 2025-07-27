@@ -17,7 +17,7 @@ export default class DinoWipeCommand extends SlashSubCommand {
     await ctx.defer();
 
     // Get the chosen ARK server
-    const arkServer = this.config.ark.servers.find((server) => server.name === ctx.options.restart.server);
+    const arkServer = this.config.ark.servers.find((server) => server.name === ctx.options.dinowipe.server);
     if (!arkServer) {
       await ctx.editOriginal({ content: `That ARK server doesn't exist!`, components: [] });
       return;
