@@ -1,6 +1,6 @@
 import { readableStreamToText, spawn } from "bun";
 import { Colors } from "discord.js";
-import type { CommandContext } from "slash-create";
+import type { CommandContext, ComponentContext } from "slash-create";
 import { labels, log } from "../../logging.ts";
 import { SlashSubCommand } from "../index.ts";
 import { listPlayers } from "./listplayers.ts";
@@ -35,7 +35,9 @@ export default class ListCommand extends SlashSubCommand {
 
           // Query the number of connected players
           const players = await listPlayers(arkServer).then((players) =>
-            players.length > 0 ? `\n${players.map((player, index) => `${index + 1}. ${player}`).join("\n")}` : "No players",
+            players.length > 0
+              ? `\n${players.map((player, index) => `${index + 1}. ${player}`).join("\n")}`
+              : "No players",
           );
 
           // Build the embed field
@@ -76,7 +78,7 @@ export default class ListCommand extends SlashSubCommand {
  * @param ctx The command context.
  * @return An array of running ARK service names.
  */
-export async function getDockerServices(ctx: CommandContext) {
+export async function getDockerServices(ctx: CommandContext | ComponentContext) {
   log.info("@%s is querying running ARK servers...", ctx.user.username, labels.ark);
   const proc = spawn([
     "docker",

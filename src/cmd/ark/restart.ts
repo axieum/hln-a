@@ -1,9 +1,10 @@
-import { readableStreamToText, spawn } from "bun";
+import { spawn } from "bun";
 import { Colors } from "discord.js";
 import { ButtonStyle, type CommandContext, type ComponentContext, ComponentType } from "slash-create";
 import type { ArkServer } from "../../config/ark.ts";
 import { labels, log } from "../../logging.ts";
 import { SlashSubCommand } from "../index.ts";
+import { getDockerServices } from "./list.ts";
 
 /**
  * A Discord command to restart an ARK server.
@@ -58,8 +59,21 @@ export default class RestartCommand extends SlashSubCommand {
  */
 export async function restartArk(btnCtx: ComponentContext, arkServer: ArkServer) {
   const { user } = btnCtx;
+  await btnCtx.acknowledge();
   log.info("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
 
+  // Check that the ARK is actually running
+  if (!(await getDockerServices(btnCtx)).find(([service]) => service === arkServer.docker_service)) {
+    log.info("@%s tried to restart %s but it was offline", user.username, arkServer.label, labels.ark);
+    await btnCtx.editOriginal({
+      content: "",
+      embeds: [{ description: `We tried to restart **${arkServer.label}** but it was offline!`, color: Colors.Red }],
+      components: [],
+    });
+    return;
+  }
+
+  // The ARK is running, go ahead and restart it
   try {
     const proc = spawn([
       "docker",
@@ -70,37 +84,18 @@ export async function restartArk(btnCtx: ComponentContext, arkServer: ArkServer)
       arkServer.docker_service,
     ]);
 
-    const exitCode = await proc.exited;
-    const stdout = (await readableStreamToText(proc.stdout)).trim();
-    log.debug("> %s", stdout, labels.ark);
-
-    if (exitCode === 0) {
-      // `/docker compose restart` will exit successfully even if the container was never running, so check stdout
-      if (stdout.length > 0) {
-        log.info("@%s restarted %s", user.username, arkServer.label, labels.ark);
-        await btnCtx.editOriginal({
-          content: "",
-          embeds: [
-            {
-              description: `You just restarted **${arkServer.label}**, please wait a few minutes for it to appear.`,
-              color: Colors.Green,
-            },
-          ],
-          components: [],
-        });
-      } else {
-        log.info("@%s tried to restart %s but it was offline", user.username, arkServer.label, labels.ark);
-        await btnCtx.editOriginal({
-          content: "",
-          embeds: [
-            {
-              description: `We tried to restart **${arkServer.label}** but it was offline!`,
-              color: Colors.Red,
-            },
-          ],
-          components: [],
-        });
-      }
+    if ((await proc.exited) === 0) {
+      log.info("@%s restarted %s", user.username, arkServer.label, labels.ark);
+      await btnCtx.editOriginal({
+        content: "",
+        embeds: [
+          {
+            description: `You just restarted **${arkServer.label}**, please wait a few minutes for it to appear.`,
+            color: Colors.Green,
+          },
+        ],
+        components: [],
+      });
     } else {
       log.error("@%s failed to restart %s with exit code", user.username, arkServer.label, proc.exitCode, labels.ark);
       await btnCtx.editOriginal({
