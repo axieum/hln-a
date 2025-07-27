@@ -20,7 +20,10 @@ services:
     image: ghcr.io/axieum/hln-a
     container_name: hln-a
     restart: unless-stopped
+    user: root
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/ark/docker-compose.yaml:/home/ark/docker-compose.yaml
       - ./hln-a:/data
 ```
 </details>
