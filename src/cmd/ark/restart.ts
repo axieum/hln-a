@@ -71,20 +71,36 @@ export async function restartArk(btnCtx: ComponentContext, arkServer: ArkServer)
     ]);
 
     const exitCode = await proc.exited;
-    log.debug("> %s", readableStreamToText(proc.stdout), labels.ark);
+    const stdout = (await readableStreamToText(proc.stdout)).trim();
+    log.debug("> %s", stdout, labels.ark);
 
     if (exitCode === 0) {
-      log.info("@%s restarted %s", user.username, arkServer.label, labels.ark);
-      await btnCtx.editOriginal({
-        content: "",
-        embeds: [
-          {
-            description: `You just restarted **${arkServer.label}**, please wait a few minutes for it to appear.`,
-            color: Colors.Green,
-          },
-        ],
-        components: [],
-      });
+      // `/docker compose restart` will exit successfully even if the container was never running, so check stdout
+      if (stdout.length > 0) {
+        log.info("@%s restarted %s", user.username, arkServer.label, labels.ark);
+        await btnCtx.editOriginal({
+          content: "",
+          embeds: [
+            {
+              description: `You just restarted **${arkServer.label}**, please wait a few minutes for it to appear.`,
+              color: Colors.Green,
+            },
+          ],
+          components: [],
+        });
+      } else {
+        log.info("@%s tried to restart %s but it was offline", user.username, arkServer.label, labels.ark);
+        await btnCtx.editOriginal({
+          content: "",
+          embeds: [
+            {
+              description: `We tried to restart **${arkServer.label}** but it was offline!`,
+              color: Colors.Red,
+            },
+          ],
+          components: [],
+        });
+      }
     } else {
       log.error("@%s failed to restart %s with exit code", user.username, arkServer.label, proc.exitCode, labels.ark);
       await btnCtx.editOriginal({
