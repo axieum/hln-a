@@ -41,7 +41,7 @@ export default class ListCommand extends SlashSubCommand {
           // Build the embed field
           return {
             name: arkServer.label,
-            value: `Up for ${uptime}\n**Players:** ${players}`,
+            value: `**Uptime:** ${uptime}\n**Players:** ${players}`,
             inline: true,
           };
         }),
