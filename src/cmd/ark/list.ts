@@ -101,7 +101,9 @@ export async function getDockerServices(ctx: CommandContext) {
   // Return [['ark-ragnarok', '3 days'], ...]
   return stdout
     .split("\n")
-    .map((line) => line.trim().split(" | "))
+    .map((line) => line.trim())
+    .filter((line) => line && line.length > 0)
+    .map((line) => line.split(" | "))
     .map(([service, uptime]) => [service, uptime.replace(" ago", "").trim()]);
 }
 
