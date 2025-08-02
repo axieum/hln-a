@@ -5,6 +5,7 @@ import type { ArkServer } from "../../config/ark.ts";
 import { labels, log } from "../../logging.ts";
 import { SlashSubCommand } from "../index.ts";
 import { getDockerServices } from "./list.ts";
+import { saveArk } from "./stop.ts";
 
 /**
  * A Discord command to restart an ARK server.
@@ -71,9 +72,31 @@ export default class RestartCommand extends SlashSubCommand {
 export async function restartArk(btnCtx: ComponentContext, arkServer: ArkServer) {
   const { user } = btnCtx;
   await btnCtx.acknowledge();
-  log.info("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
 
+  // Save the ARK world
   try {
+    log.info("@%s is saving %s...", user.username, arkServer.label, labels.ark);
+    await btnCtx.editOriginal({ content: `Saving **${arkServer.label}** ...`, embeds: [], components: [] });
+    await saveArk(arkServer);
+  } catch (err) {
+    log.error("@%s failed to save %s: %s", user.username, arkServer.label, err, labels.ark);
+    await btnCtx.editOriginal({
+      content: "",
+      embeds: [
+        {
+          description: `We tried to save **${arkServer.label}** before restarting but failed, please try again later!`,
+          color: Colors.Red,
+        },
+      ],
+      components: [],
+    });
+    return;
+  }
+
+  // Restart the ARK server
+  try {
+    log.info("@%s is restarting %s...", user.username, arkServer.label, labels.ark);
+    await btnCtx.editOriginal({ content: `Restarting **${arkServer.label}** ...`, embeds: [], components: [] });
     const proc = spawn([
       "docker",
       "compose",
