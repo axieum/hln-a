@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.0](https://github.com/axieum/hln-a/compare/v1.3.0...v1.4.0) (2025-08-02)
+
+
+### Features
+
+* **ark:** execute `SaveWorld` before stopping any ARKs ([92fb3f5](https://github.com/axieum/hln-a/commit/92fb3f59126efc0f6a2e59b388f412de9bcb11db))
+
+
+### Bug Fixes
+
+* **ark:** gracefully handle no running Docker containers ([76bc6df](https://github.com/axieum/hln-a/commit/76bc6df9df1252df17d75b1603fcb8c3994f2ca5))
+
 ## [1.3.0](https://github.com/axieum/hln-a/compare/v1.2.0...v1.3.0) (2025-07-27)
 
 
